@@ -2,6 +2,7 @@
 
 namespace App\Services\EventConsume;
 
+use App\Services\EventConsume\Handlers\BroadcastSendHandler;
 use App\Services\EventConsume\Handlers\EmailSendHandler;
 use App\Services\EventConsume\Handlers\NotificationSendHandler;
 use App\Services\EventConsume\Handlers\RoleEmailSendHandler;
@@ -53,6 +54,12 @@ class EventRouter
             // COMMUNICATION
             "{$notificationsPrefix}.email.send" => EmailSendHandler::class,
             "{$notificationsPrefix}.notification.send" => NotificationSendHandler::class,
+
+            // LIVE STATE — broadcast only, persists nothing. Same Reverb and
+            // same private-users.{id} channel as a notification, but no
+            // InAppNotification row, so a producer can push a moving figure
+            // without filling the bell. The producer names its own event.
+            "{$notificationsPrefix}.broadcast.send" => BroadcastSendHandler::class,
 
             // COMMUNICATION — role/store targeted (resolves recipients from user_store_roles)
             "{$notificationsPrefix}.notification.role.send" => RoleNotificationSendHandler::class,
