@@ -14,11 +14,14 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'auth.token.store' => \App\Http\Middleware\AuthTokenStoreScopeMiddleware::class,
+            'throttle' => \App\Http\Middleware\ObservableThrottleRequests::class,
         ]);
     })
+    // Every websocket subscribe verifies against pizzasys, so it is throttled
+    // ahead of that call like any other route.
     ->withBroadcasting(__DIR__ . '/../routes/channels.php', [
         'prefix' => 'api',
-        'middleware' => ['api', 'auth.token.store'],
+        'middleware' => ['api', 'throttle:api-poll', 'auth.token.store'],
     ])
     ->withExceptions(function (Exceptions $exceptions): void {
         //
