@@ -13,6 +13,9 @@ Route::middleware(['throttle:api', 'auth.token.store'])->prefix('announcements')
     Route::get('/visible', [AnnouncementController::class, 'visible'])->withoutMiddleware('throttle:api')->middleware('throttle:api-poll');
     Route::get('/unseen', [AnnouncementController::class, 'unseen'])->withoutMiddleware('throttle:api')->middleware('throttle:api-poll');
     Route::post('/mark-seen', [AnnouncementController::class, 'markSeen']);
+    // Unified calendar feed. Stores are in the query (stores=a,b): the pizzasys
+    // rule must read store_id_sources.query ["stores"] with policy "all".
+    Route::get('/calendar/feed', \App\Http\Controllers\CalendarFeedController::class);
     Route::get('/{announcement}', [AnnouncementController::class, 'show']);
     Route::put('/{announcement}', [AnnouncementController::class, 'update']);
     Route::delete('/{announcement}', [AnnouncementController::class, 'destroy']);
