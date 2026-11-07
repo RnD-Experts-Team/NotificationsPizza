@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -16,6 +17,12 @@ return Application::configure(basePath: dirname(__DIR__))
             'auth.token.store' => \App\Http\Middleware\AuthTokenStoreScopeMiddleware::class,
             'throttle' => \App\Http\Middleware\ObservableThrottleRequests::class,
         ]);
+
+        // The proxies themselves come from config/trustedproxy.php (TRUSTED_PROXIES).
+        $middleware->trustProxies(headers: Request::HEADER_X_FORWARDED_FOR
+            | Request::HEADER_X_FORWARDED_PROTO
+            | Request::HEADER_X_FORWARDED_HOST
+            | Request::HEADER_X_FORWARDED_PORT);
     })
     // Every websocket subscribe verifies against pizzasys, so it is throttled
     // ahead of that call like any other route.
