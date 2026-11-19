@@ -242,6 +242,8 @@ class ThrottleTest extends TestCase
             ->unique()->sort()->values()->all();
 
         $this->assertSame([
+            'api/announcements/media/gifs/search',
+            'api/announcements/media/gifs/trending',
             'api/announcements/unseen',
             'api/announcements/visible',
             'api/broadcasting/auth',

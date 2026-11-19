@@ -38,6 +38,14 @@ return [
         'server_key' => env('FIREBASE_SERVER_KEY'),
     ],
 
+    // GIF picker for announcements/comments (WhatsApp-style trending/search
+    // grid). Provider choice (Giphy here) is a decision that needs the
+    // manager's confirmation — see docs/IMPLEMENTATION_TASKS_ANNOUNCEMENTS_MEDIA.md.
+    'giphy' => [
+        'key' => env('GIPHY_API_KEY'),
+        'base_url' => env('GIPHY_BASE_URL', 'https://api.giphy.com/v1/gifs'),
+    ],
+
     'auth_server' => [
         'base_url' => env('AUTH_SERVER_BASE_URL', 'http://auth-service.local'),
         'verify_path' => env('AUTH_SERVER_VERIFY_PATH', '/api/v1/auth/token-verify'),

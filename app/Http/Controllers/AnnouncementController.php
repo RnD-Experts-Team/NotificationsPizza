@@ -6,6 +6,7 @@ use App\Http\Requests\Announcement\MarkAnnouncementsSeenRequest;
 use App\Http\Requests\Announcement\StoreAnnouncementRequest;
 use App\Http\Requests\Announcement\UpdateAnnouncementRequest;
 use App\Models\Announcement;
+use App\Services\Announcement\LikeService;
 use App\Services\AnnouncementService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -13,16 +14,18 @@ use Illuminate\Http\Request;
 class AnnouncementController extends Controller
 {
     public function __construct(
-        private readonly AnnouncementService $service
+        private readonly AnnouncementService $service,
+        private readonly LikeService $likeService,
     ) {
     }
 
     public function index(Request $request): JsonResponse
     {
         $perPage = max(1, (int) $request->integer('per_page', 15));
+        $userId = (int) $request->user()->id;
 
         return response()->json(
-            $this->service->paginateForAdmin($perPage)
+            $this->service->paginateForAdmin($perPage, $userId)
         );
     }
 
@@ -82,5 +85,19 @@ class AnnouncementController extends Controller
         return response()->json([
             'message' => 'Announcements marked as seen.',
         ]);
+    }
+
+    public function like(Request $request, Announcement $announcement): JsonResponse
+    {
+        $userId = (int) $request->user()->id;
+
+        return response()->json($this->likeService->like($announcement, $userId));
+    }
+
+    public function unlike(Request $request, Announcement $announcement): JsonResponse
+    {
+        $userId = (int) $request->user()->id;
+
+        return response()->json($this->likeService->unlike($announcement, $userId));
     }
 }

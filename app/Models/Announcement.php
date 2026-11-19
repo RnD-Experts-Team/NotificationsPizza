@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Announcement extends Model
 {
+    use Concerns\Likeable;
+
     protected $fillable = [
         'type',
         'title',
@@ -16,6 +18,10 @@ class Announcement extends Model
         'starts_at',
         'ends_at',
         'is_pinned',
+        'media_url',
+        'media_type',
+        'color_start',
+        'color_end',
     ];
 
     protected $casts = [
@@ -28,5 +34,10 @@ class Announcement extends Model
     public function userStates(): HasMany
     {
         return $this->hasMany(AnnouncementUserState::class);
+    }
+
+    public function comments(): HasMany
+    {
+        return $this->hasMany(AnnouncementComment::class);
     }
 }

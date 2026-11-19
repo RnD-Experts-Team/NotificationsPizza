@@ -47,6 +47,27 @@ return [
             'report' => false,
         ],
 
+        // Dedicated disk for announcement media (images, GIFs, videos) and the
+        // temporary chunk storage used while assembling a video upload. Kept
+        // separate from the default 'public' disk so this can be repointed to
+        // an S3-compatible disk later by changing only this block.
+        'announcements' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/announcements'),
+            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage/announcements',
+            'visibility' => 'public',
+            'throw' => false,
+            'report' => false,
+        ],
+
+        'announcements_chunks' => [
+            'driver' => 'local',
+            'root' => storage_path('app/private/announcement-chunks'),
+            'visibility' => 'private',
+            'throw' => false,
+            'report' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
