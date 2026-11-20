@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('announcement_id')->constrained('announcements')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->text('body')->nullable();
-            $table->string('media_url')->nullable();
+            $table->string('media_path')->nullable();
             $table->string('media_type', 20)->nullable();
             $table->timestamps();
 

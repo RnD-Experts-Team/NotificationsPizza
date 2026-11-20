@@ -13,13 +13,13 @@ class CleanupAbandonedAnnouncementChunks extends Command
 {
     public function handle(): int
     {
-        $disk = Storage::disk('announcements_chunks');
+        $disk = Storage::disk('local');
         $thresholdSeconds = ((int) $this->option('minutes')) * 60;
         $now = time();
 
         $deleted = 0;
 
-        foreach ($disk->directories('chunks') as $directory) {
+        foreach ($disk->directories('announcement-chunks/chunks') as $directory) {
             $realPath = $disk->path($directory);
             $age = $now - (is_dir($realPath) ? filemtime($realPath) : $now);
 

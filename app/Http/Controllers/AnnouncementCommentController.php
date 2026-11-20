@@ -48,17 +48,10 @@ class AnnouncementCommentController extends Controller
         ]);
     }
 
-    public function like(Request $request, AnnouncementComment $comment): JsonResponse
+    public function toggleLike(Request $request, AnnouncementComment $comment): JsonResponse
     {
         $userId = (int) $request->user()->id;
 
-        return response()->json($this->likeService->like($comment, $userId));
-    }
-
-    public function unlike(Request $request, AnnouncementComment $comment): JsonResponse
-    {
-        $userId = (int) $request->user()->id;
-
-        return response()->json($this->likeService->unlike($comment, $userId));
+        return response()->json($this->likeService->toggle($comment, $userId));
     }
 }

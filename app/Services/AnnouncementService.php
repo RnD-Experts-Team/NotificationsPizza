@@ -51,8 +51,11 @@ class AnnouncementService
                 'is_pinned' => $data['is_pinned'] ?? false,
                 'starts_at' => $data['starts_at'] ?? null,
                 'ends_at' => $data['ends_at'] ?? null,
-                'media_url' => $data['media_url'] ?? null,
+                'media_path' => $data['media_path'] ?? null,
                 'media_type' => $data['media_type'] ?? null,
+                'media_width' => $data['media_width'] ?? null,
+                'media_height' => $data['media_height'] ?? null,
+                'media_duration_seconds' => $data['media_duration_seconds'] ?? null,
                 'color_start' => $data['color_start'] ?? null,
                 'color_end' => $data['color_end'] ?? null,
             ]);
@@ -79,7 +82,7 @@ class AnnouncementService
     public function update(Announcement $announcement, array $data): Announcement
     {
         return DB::transaction(function () use ($announcement, $data) {
-            $previousMediaUrl = $announcement->media_url;
+            $previousMediaPath = $announcement->media_path;
 
             $announcement->update([
                 'type' => $data['type'] ?? $announcement->type,
@@ -90,16 +93,19 @@ class AnnouncementService
                 'is_pinned' => $data['is_pinned'] ?? $announcement->is_pinned,
                 'starts_at' => array_key_exists('starts_at', $data) ? $data['starts_at'] : $announcement->starts_at,
                 'ends_at' => array_key_exists('ends_at', $data) ? $data['ends_at'] : $announcement->ends_at,
-                'media_url' => array_key_exists('media_url', $data) ? $data['media_url'] : $announcement->media_url,
+                'media_path' => array_key_exists('media_path', $data) ? $data['media_path'] : $announcement->media_path,
                 'media_type' => array_key_exists('media_type', $data) ? $data['media_type'] : $announcement->media_type,
+                'media_width' => array_key_exists('media_width', $data) ? $data['media_width'] : $announcement->media_width,
+                'media_height' => array_key_exists('media_height', $data) ? $data['media_height'] : $announcement->media_height,
+                'media_duration_seconds' => array_key_exists('media_duration_seconds', $data) ? $data['media_duration_seconds'] : $announcement->media_duration_seconds,
                 'color_start' => array_key_exists('color_start', $data) ? $data['color_start'] : $announcement->color_start,
                 'color_end' => array_key_exists('color_end', $data) ? $data['color_end'] : $announcement->color_end,
             ]);
 
             $announcement->refresh();
 
-            if ($previousMediaUrl && $previousMediaUrl !== $announcement->media_url) {
-                $this->mediaService->deleteByUrl($previousMediaUrl);
+            if ($previousMediaPath && $previousMediaPath !== $announcement->media_path) {
+                $this->mediaService->deleteByPath($previousMediaPath);
             }
 
             dispatch(new SendBulkNotificationJob(
@@ -124,11 +130,11 @@ class AnnouncementService
 
     public function delete(Announcement $announcement): void
     {
-        $mediaUrl = $announcement->media_url;
+        $mediaPath = $announcement->media_path;
 
         $announcement->delete();
 
-        $this->mediaService->deleteByUrl($mediaUrl);
+        $this->mediaService->deleteByPath($mediaPath);
     }
 
     public function getVisibleForUser(int $userId): Collection

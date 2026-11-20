@@ -42,7 +42,7 @@ class AnnouncementCommentService
             'announcement_id' => $announcementId,
             'user_id' => $userId,
             'body' => $data['body'] ?? null,
-            'media_url' => $data['media_url'] ?? null,
+            'media_path' => $data['media_path'] ?? null,
             'media_type' => $data['media_type'] ?? null,
         ])->load('user:id,name');
     }
@@ -58,10 +58,10 @@ class AnnouncementCommentService
             throw new AuthorizationException('You can only delete your own comment.');
         }
 
-        $mediaUrl = $comment->media_url;
+        $mediaPath = $comment->media_path;
 
         $comment->delete();
 
-        $this->mediaService->deleteByUrl($mediaUrl);
+        $this->mediaService->deleteByPath($mediaPath);
     }
 }

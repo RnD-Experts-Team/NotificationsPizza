@@ -26,23 +26,24 @@ Route::middleware(['throttle:api', 'auth.token.store'])->prefix('announcements')
         Route::post('/image', [AnnouncementMediaController::class, 'uploadImage']);
         Route::get('/gifs/trending', [AnnouncementMediaController::class, 'gifsTrending'])->withoutMiddleware('throttle:api')->middleware('throttle:api-poll');
         Route::get('/gifs/search', [AnnouncementMediaController::class, 'gifsSearch'])->withoutMiddleware('throttle:api')->middleware('throttle:api-poll');
-        Route::post('/video/chunk', [AnnouncementMediaController::class, 'uploadVideoChunk']);
-        Route::delete('/video/chunk/revert', [AnnouncementMediaController::class, 'revertVideoChunk']);
+        // The upload uuid is backend-issued by initVideoUpload, never sent
+        // by the frontend — see AnnouncementVideoChunkUploadService.
+        Route::post('/video/uploads', [AnnouncementMediaController::class, 'initVideoUpload']);
+        Route::post('/video/uploads/{uploadUuid}/chunks/{chunkIndex}', [AnnouncementMediaController::class, 'uploadVideoChunk'])
+            ->whereUuid('uploadUuid')->whereNumber('chunkIndex');
+        Route::delete('/video/uploads/{uploadUuid}', [AnnouncementMediaController::class, 'revertVideoChunk'])
+            ->whereUuid('uploadUuid');
     });
 
-    // Comments (Phase 10) and likes (Phase 11) on a comment. Like/unlike are
-    // PUT/DELETE, not a single toggle POST — idempotent, so a retried request
-    // (lost response, double-tap) can never flip the state to the opposite
-    // of what the user intended.
+    // Comments (Phase 10) and likes (Phase 11) on a comment. A single toggle
+    // endpoint, per manager feedback — see LikeService.
     Route::delete('/comments/{comment}', [AnnouncementCommentController::class, 'destroy']);
-    Route::put('/comments/{comment}/like', [AnnouncementCommentController::class, 'like']);
-    Route::delete('/comments/{comment}/like', [AnnouncementCommentController::class, 'unlike']);
+    Route::post('/comments/{comment}/like', [AnnouncementCommentController::class, 'toggleLike']);
 
     Route::get('/{announcement}', [AnnouncementController::class, 'show']);
     Route::put('/{announcement}', [AnnouncementController::class, 'update']);
     Route::delete('/{announcement}', [AnnouncementController::class, 'destroy']);
-    Route::put('/{announcement}/like', [AnnouncementController::class, 'like']);
-    Route::delete('/{announcement}/like', [AnnouncementController::class, 'unlike']);
+    Route::post('/{announcement}/like', [AnnouncementController::class, 'toggleLike']);
     Route::get('/{announcement}/comments', [AnnouncementCommentController::class, 'index']);
     Route::post('/{announcement}/comments', [AnnouncementCommentController::class, 'store']);
 });

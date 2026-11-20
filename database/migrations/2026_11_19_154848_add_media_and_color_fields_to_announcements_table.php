@@ -12,9 +12,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('announcements', function (Blueprint $table) {
-            $table->string('media_url')->nullable()->after('body');
-            $table->string('media_type', 20)->nullable()->after('media_url');
-            $table->string('color_start', 7)->nullable()->after('media_type');
+            // A disk-relative path, not a full URL — see AnnouncementMediaService.
+            // Surviving an APP_URL/host change is the point: the real URL is
+            // computed on read, never stored.
+            $table->string('media_path')->nullable()->after('body');
+            $table->string('media_type', 20)->nullable()->after('media_path');
+            // Video only, reported by the browser at upload time.
+            $table->unsignedInteger('media_width')->nullable()->after('media_type');
+            $table->unsignedInteger('media_height')->nullable()->after('media_width');
+            $table->unsignedInteger('media_duration_seconds')->nullable()->after('media_height');
+            $table->string('color_start', 7)->nullable()->after('media_duration_seconds');
             $table->string('color_end', 7)->nullable()->after('color_start');
         });
     }
@@ -25,7 +32,10 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('announcements', function (Blueprint $table) {
-            $table->dropColumn(['media_url', 'media_type', 'color_start', 'color_end']);
+            $table->dropColumn([
+                'media_path', 'media_type', 'media_width', 'media_height',
+                'media_duration_seconds', 'color_start', 'color_end',
+            ]);
         });
     }
 };

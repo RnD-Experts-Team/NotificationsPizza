@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Announcement\AnnouncementGifSearchRequest;
 use App\Http\Requests\Announcement\AnnouncementVideoChunkUploadRequest;
+use App\Http\Requests\Announcement\InitAnnouncementVideoUploadRequest;
 use App\Http\Requests\Announcement\UploadAnnouncementImageRequest;
 use App\Services\Announcement\AnnouncementMediaService;
 use App\Services\Announcement\AnnouncementVideoChunkUploadService;
@@ -51,27 +52,39 @@ class AnnouncementMediaController extends Controller
         ]);
     }
 
-    public function uploadVideoChunk(AnnouncementVideoChunkUploadRequest $request): JsonResponse
+    public function initVideoUpload(InitAnnouncementVideoUploadRequest $request): JsonResponse
+    {
+        $data = $request->validated();
+
+        return response()->json(
+            $this->videoChunkUploadService->initUpload(
+                $data['total_chunks'],
+                $data['total_size'],
+                $data['original_filename'],
+            ),
+            201
+        );
+    }
+
+    public function uploadVideoChunk(AnnouncementVideoChunkUploadRequest $request, string $uploadUuid, int $chunkIndex): JsonResponse
     {
         $data = $request->validated();
 
         $result = $this->videoChunkUploadService->uploadChunk(
             $request->file('chunk'),
-            $data['upload_uuid'],
-            $data['chunk_index'],
-            $data['total_chunks'],
-            $data['original_filename'] ?? null,
-            $data['total_size'] ?? null,
+            $uploadUuid,
+            $chunkIndex,
+            $data['width'] ?? null,
+            $data['height'] ?? null,
+            $data['duration_seconds'] ?? null,
         );
 
         return response()->json($result, $result['status'] === 'complete' ? 201 : 202);
     }
 
-    public function revertVideoChunk(Request $request): JsonResponse
+    public function revertVideoChunk(string $uploadUuid): JsonResponse
     {
-        $uuid = (string) $request->input('upload_uuid', '');
-
-        $this->videoChunkUploadService->revert($uuid);
+        $this->videoChunkUploadService->revert($uploadUuid);
 
         return response()->json(['message' => 'Upload reverted.']);
     }

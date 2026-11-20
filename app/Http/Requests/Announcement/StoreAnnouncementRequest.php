@@ -24,8 +24,11 @@ class StoreAnnouncementRequest extends FormRequest
             'is_pinned' => ['nullable', 'boolean'],
             'starts_at' => ['nullable', 'date'],
             'ends_at' => ['nullable', 'date', 'after_or_equal:starts_at'],
-            'media_url' => ['nullable', 'string', 'max:2048', new MediaUrl()],
+            'media_path' => ['nullable', 'string', new MediaUrl()],
             'media_type' => ['nullable', 'string', 'in:image,gif,video'],
+            'media_width' => ['nullable', 'integer', 'min:1'],
+            'media_height' => ['nullable', 'integer', 'min:1'],
+            'media_duration_seconds' => ['nullable', 'integer', 'min:0'],
             'color_start' => ['nullable', 'regex:/^#[0-9A-Fa-f]{6}$/'],
             'color_end' => ['nullable', 'regex:/^#[0-9A-Fa-f]{6}$/'],
         ];

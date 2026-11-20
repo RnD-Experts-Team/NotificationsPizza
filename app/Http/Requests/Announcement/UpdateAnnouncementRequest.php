@@ -24,8 +24,11 @@ class UpdateAnnouncementRequest extends FormRequest
             'is_pinned' => ['sometimes', 'boolean'],
             'starts_at' => ['sometimes', 'nullable', 'date'],
             'ends_at' => ['sometimes', 'nullable', 'date', 'after_or_equal:starts_at'],
-            'media_url' => ['sometimes', 'nullable', 'string', 'max:2048', new MediaUrl()],
+            'media_path' => ['sometimes', 'nullable', 'string', new MediaUrl()],
             'media_type' => ['sometimes', 'nullable', 'string', 'in:image,gif,video'],
+            'media_width' => ['sometimes', 'nullable', 'integer', 'min:1'],
+            'media_height' => ['sometimes', 'nullable', 'integer', 'min:1'],
+            'media_duration_seconds' => ['sometimes', 'nullable', 'integer', 'min:0'],
             'color_start' => ['sometimes', 'nullable', 'regex:/^#[0-9A-Fa-f]{6}$/'],
             'color_end' => ['sometimes', 'nullable', 'regex:/^#[0-9A-Fa-f]{6}$/'],
         ];
