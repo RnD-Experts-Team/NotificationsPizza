@@ -13,16 +13,17 @@ use Illuminate\Http\Request;
 class AnnouncementController extends Controller
 {
     public function __construct(
-        private readonly AnnouncementService $service
+        private readonly AnnouncementService $service,
     ) {
     }
 
     public function index(Request $request): JsonResponse
     {
         $perPage = max(1, (int) $request->integer('per_page', 15));
+        $userId = (int) $request->user()->id;
 
         return response()->json(
-            $this->service->paginateForAdmin($perPage)
+            $this->service->paginateForAdmin($perPage, $userId)
         );
     }
 
@@ -82,5 +83,12 @@ class AnnouncementController extends Controller
         return response()->json([
             'message' => 'Announcements marked as seen.',
         ]);
+    }
+
+    public function toggleLike(Request $request, Announcement $announcement): JsonResponse
+    {
+        $userId = (int) $request->user()->id;
+
+        return response()->json($announcement->toggleLike($userId));
     }
 }
