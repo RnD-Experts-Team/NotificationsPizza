@@ -6,7 +6,6 @@ use App\Http\Requests\Announcement\MarkAnnouncementsSeenRequest;
 use App\Http\Requests\Announcement\StoreAnnouncementRequest;
 use App\Http\Requests\Announcement\UpdateAnnouncementRequest;
 use App\Models\Announcement;
-use App\Services\Announcement\LikeService;
 use App\Services\AnnouncementService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -15,7 +14,6 @@ class AnnouncementController extends Controller
 {
     public function __construct(
         private readonly AnnouncementService $service,
-        private readonly LikeService $likeService,
     ) {
     }
 
@@ -91,6 +89,6 @@ class AnnouncementController extends Controller
     {
         $userId = (int) $request->user()->id;
 
-        return response()->json($this->likeService->toggle($announcement, $userId));
+        return response()->json($announcement->toggleLike($userId));
     }
 }

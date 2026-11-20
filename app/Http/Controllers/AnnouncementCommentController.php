@@ -6,7 +6,6 @@ use App\Http\Requests\Announcement\StoreAnnouncementCommentRequest;
 use App\Models\Announcement;
 use App\Models\AnnouncementComment;
 use App\Services\Announcement\AnnouncementCommentService;
-use App\Services\Announcement\LikeService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -14,7 +13,6 @@ class AnnouncementCommentController extends Controller
 {
     public function __construct(
         private readonly AnnouncementCommentService $service,
-        private readonly LikeService $likeService,
     ) {
     }
 
@@ -52,6 +50,6 @@ class AnnouncementCommentController extends Controller
     {
         $userId = (int) $request->user()->id;
 
-        return response()->json($this->likeService->toggle($comment, $userId));
+        return response()->json($comment->toggleLike($userId));
     }
 }

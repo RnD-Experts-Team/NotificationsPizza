@@ -36,9 +36,9 @@ Route::middleware(['throttle:api', 'auth.token.store'])->prefix('announcements')
     });
 
     // Comments (Phase 10) and likes (Phase 11) on a comment. A single toggle
-    // endpoint, per manager feedback — see LikeService.
-    Route::delete('/comments/{comment}', [AnnouncementCommentController::class, 'destroy']);
-    Route::post('/comments/{comment}/like', [AnnouncementCommentController::class, 'toggleLike']);
+    // endpoint for like — see Likeable.
+    Route::delete('/announcement/comments/{comment}', [AnnouncementCommentController::class, 'destroy']);
+    Route::post('/announcement/comments/{comment}/like', [AnnouncementCommentController::class, 'toggleLike']);
 
     Route::get('/{announcement}', [AnnouncementController::class, 'show']);
     Route::put('/{announcement}', [AnnouncementController::class, 'update']);

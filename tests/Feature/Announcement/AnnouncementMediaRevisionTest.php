@@ -58,10 +58,10 @@ class AnnouncementMediaRevisionTest extends TestCase
             'body' => 'hi',
         ]);
 
-        $this->postJson("/api/announcements/comments/{$comment->id}/like", [], $this->headers())
+        $this->postJson("/api/announcements/announcement/comments/{$comment->id}/like", [], $this->headers())
             ->assertOk()->assertJson(['liked' => true, 'likes_count' => 1]);
 
-        $this->postJson("/api/announcements/comments/{$comment->id}/like", [], $this->headers())
+        $this->postJson("/api/announcements/announcement/comments/{$comment->id}/like", [], $this->headers())
             ->assertOk()->assertJson(['liked' => false, 'likes_count' => 0]);
     }
 
