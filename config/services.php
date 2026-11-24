@@ -38,6 +38,23 @@ return [
         'server_key' => env('FIREBASE_SERVER_KEY'),
     ],
 
+    // GIF picker for announcements/comments (WhatsApp-style trending/search
+    // grid). Provider choice (Giphy here) is a decision that needs the
+    // manager's confirmation — see docs/IMPLEMENTATION_TASKS_ANNOUNCEMENTS_MEDIA.md.
+    'giphy' => [
+        'key' => env('GIPHY_API_KEY'),
+        'base_url' => env('GIPHY_BASE_URL', 'https://api.giphy.com/v1/gifs'),
+    ],
+
+    // Announcement media (image/GIF/video self-upload + chunked video).
+    // Enforced WHILE chunks are arriving (see AnnouncementVideoChunkUploadService),
+    // not only after the final merge, so an oversized upload is rejected and
+    // its temp chunks deleted as soon as the running total crosses this
+    // limit. Raising it later is just this one env var.
+    'announcements' => [
+        'max_video_bytes' => (int) env('ANNOUNCEMENTS_MAX_VIDEO_BYTES', 100 * 1024 * 1024),
+    ],
+
     'auth_server' => [
         'base_url' => env('AUTH_SERVER_BASE_URL', 'http://auth-service.local'),
         'verify_path' => env('AUTH_SERVER_VERIFY_PATH', '/api/v1/auth/token-verify'),

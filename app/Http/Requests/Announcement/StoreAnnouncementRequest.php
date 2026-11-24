@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\Announcement;
 
+use App\Rules\MediaUrl;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreAnnouncementRequest extends FormRequest
@@ -22,6 +24,27 @@ class StoreAnnouncementRequest extends FormRequest
             'is_pinned' => ['nullable', 'boolean'],
             'starts_at' => ['nullable', 'date'],
             'ends_at' => ['nullable', 'date', 'after_or_equal:starts_at'],
+            'media_path' => ['nullable', 'string', new MediaUrl()],
+            'media_type' => ['nullable', 'string', 'in:image,gif,video'],
+            'media_width' => ['nullable', 'integer', 'min:1'],
+            'media_height' => ['nullable', 'integer', 'min:1'],
+            'media_duration_seconds' => ['nullable', 'integer', 'min:0'],
+            'color_start' => ['nullable', 'regex:/^#[0-9A-Fa-f]{6}$/'],
+            'color_end' => ['nullable', 'regex:/^#[0-9A-Fa-f]{6}$/'],
         ];
+    }
+
+    /**
+     * A single color (color_start only) means "solid color"; two colors
+     * means "gradient". color_end without color_start has no meaning, so
+     * it's rejected explicitly rather than silently ignored.
+     */
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator) {
+            if ($this->filled('color_end') && !$this->filled('color_start')) {
+                $validator->errors()->add('color_end', 'color_end requires color_start to also be set.');
+            }
+        });
     }
 }
